@@ -46,6 +46,8 @@ class Blockchain {
     addBlock(block) {
         // Add your code here
         // let self = this;
+        console.log(block)
+
         return new Promise((resolve, reject) => {
             this.getBlockHeight().then((chainLength) => {
                 // Block chainLength

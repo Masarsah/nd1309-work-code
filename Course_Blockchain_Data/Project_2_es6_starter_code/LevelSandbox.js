@@ -22,7 +22,7 @@ class LevelSandbox {
                     console.log(`${key} Error !`, err);
 
                 }
-                resolve(value);
+                resolve(value,  'GET successed !!');
             });
 
         });
@@ -38,7 +38,7 @@ class LevelSandbox {
                     console.log('Error with Put!', err);
                     reject(`(${key},${value}) Error with Put!`);
                 }
-                resolve(`${JSON.stringify(key)}, ${JSON.stringify(value)} Put successed !!`);
+                resolve(`${JSON.stringify(key)}, ${JSON.stringify(value)} PUT successed !!`);
             });
         });
     }
@@ -76,10 +76,8 @@ class LevelSandbox {
                     reject(`Error addDataToLevelDB  !! ${data}`);
                 })
                 .on('close', function () {
-                    console.log('');
                     console.log(`Adding Block....${i}`, data);
                     self.addLevelDBData(i, data).then((writtenBlock) => {
-                        console.log('');
                     }, (reject) => {
                         console.log(' Adding block failed.....' + i);
                     });

@@ -6,7 +6,7 @@ class Block {
 	constructor(data){
 		// Add your Block properties
 		// Example: this.hash = "";
-		this.hash = "",
+		    this.hash = "",
 			this.height = 0,
 			this.body = data,
 			this.time = 0,

@@ -76,7 +76,7 @@ class LevelSandbox {
                     reject(`Error addDataToLevelDB  !! ${data}`);
                 })
                 .on('close', function () {
-                    // console.log(`Adding Block....${i}`, data);
+                    console.log(`Adding Block....${i}`, data);
                     self.addLevelDBData(i, data).then((result) => {
                         resolve(result)
                     }).catch((err) => {
