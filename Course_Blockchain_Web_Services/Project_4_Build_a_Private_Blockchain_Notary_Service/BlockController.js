@@ -41,9 +41,11 @@ class BlockController {
 
 
     requestValidation() {
-        this.app.post("/requestValidation", (req, res) => {
+        let self = this;
+
+        self.app.post("/requestValidation", (req, res) => {
             // Add your code here
-            if (req.body.address != undefined) {
+            if (req.body) {
                 const walletAddress = req.body.address;
                 const requestTimeStamp = Date.now();
                 let response = {
@@ -117,7 +119,7 @@ class BlockController {
                         }
                     }
 
-                    this.memPool[walletAddress] = {
+                     this.memPool[walletAddress] = {
                         ...isValidRequest
                     };
                     // Remove in valid req after 30 Minutes 
@@ -131,9 +133,10 @@ class BlockController {
                     if (this.timeoutRequests[walletAddress]) {
                         delete this.timeoutRequests[walletAddress];
                     }
-                    res.json(isvalidRequest);
+                    res.json(JSON.stringify(isValidRequest));
                     // return isValidRequest
-                    console.log(isvalidRequest)
+                    // console.log(isvalidRequest)
+                    console.log(JSON.parse(JSON.stringify(isValidRequest)))
                 } else {
                     res.status(404).end()
                     console.log("error not valid ")

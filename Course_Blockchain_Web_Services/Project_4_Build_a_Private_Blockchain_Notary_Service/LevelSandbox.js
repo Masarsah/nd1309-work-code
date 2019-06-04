@@ -4,6 +4,7 @@
 
 const level = require('level');
 const chainDB = './chaindata';
+const db = level(chainDB);
 
 class LevelSandbox {
 
@@ -16,7 +17,7 @@ class LevelSandbox {
         let self = this;
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
-            self.db.get(key, function (err, value) {
+            db.get(key, function (err, value) {
                 if (err) {
                     reject('Error!');
                     console.log(`${key} Error !`, err);
@@ -36,7 +37,7 @@ class LevelSandbox {
 
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject() 
-            self.db.put(key, JSON.stringify(value), function (success, err) {
+            db.put(key, JSON.stringify(value), function (success, err) {
                 if (err) {
                     console.log('Error with Put!', err);
                     reject(`(${key},${value}) Error with Put!`);
@@ -53,7 +54,7 @@ class LevelSandbox {
         const dataArray = [];
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
-          self.db.createReadStream()
+          db.createReadStream()
                 .on('data', function (data) {
                     console.log(data)
                     dataArray.push(data);
@@ -75,7 +76,7 @@ class LevelSandbox {
         console.log(data)
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
-            self.db.createReadStream()
+            db.createReadStream()
                 .on('data', function (data) {
                     i++;
                 })
@@ -111,7 +112,7 @@ getBlockByHash(hash) {
     let self = this;
     let block = null;
     return new Promise(function(resolve, reject){
-        self.db.createReadStream()
+        db.createReadStream()
         .on('data', function (data) {
             if(data.hash === hash){
                 block = data;
@@ -131,7 +132,7 @@ getBlockByHash(hash) {
 getAddress(address) {
     let self = this;
     return new Promise((resolve, reject) => {
-        self.db.get(address, function (err, value) {
+        db.get(address, function (err, value) {
         if (err) {
           reject(err);
         } else {

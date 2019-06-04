@@ -40,6 +40,9 @@ class Blockchain {
                     resolve(chainHeight - 1);
                     console.log('chainHeight - 1')
                 }
+            }).catch((err) => {
+                // console.log(err);
+                res.send(`GETTING block Count failed ${err}`);
             });
         });
 
@@ -64,7 +67,7 @@ class Blockchain {
                         block.hash = SHA256(JSON.stringify(block)).toString();
                         this.bd.addDataToLevelDB(block);
                         resolve(block);
-                        console.log
+                        console.log(block)
                     }).catch((err) => {
                         console.log(err);
                         reject(`${err} Failed with get previous block data !`);
@@ -140,6 +143,8 @@ class Blockchain {
             Promise.all(ChainPD).then(() => {
                 resolve(chainLinkValidations);
             }, (error) => {
+                reject(`Error with validation'! ${error}`);
+
                 console.log('Error with validation' + error);
             });
         });
