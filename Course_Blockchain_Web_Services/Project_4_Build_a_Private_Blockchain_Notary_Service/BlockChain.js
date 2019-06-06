@@ -31,8 +31,8 @@ class Blockchain {
     getBlockHeight() {
         // Add your code here
         return new Promise((resolve, reject) => {
-           this.bd.getBlocksCount().then((chainHeight) => {
-                // console.log(chainHeight)
+            this.bd.getBlocksCount().then((chainHeight) => {
+                console.log(chainHeight)
                 if (chainHeight - 1 <= 0) {
                     resolve(0);
                     console.log('chainHeight - 1 <= 0')
@@ -42,36 +42,41 @@ class Blockchain {
                 }
             }).catch((err) => {
                 // console.log(err);
+                console.log(chainHeight)
+                reject(chainHeight)
                 res.send(`GETTING block Count failed ${err}`);
             });
         });
 
     }
-
     // Add new block
     addBlock(block) {
         // Add your code here
         // let self = this;
-        console.log(block)
+        console.log(block, 'second')
 
         return new Promise((resolve, reject) => {
-            this.getBlockHeight().then((chainHeight) => {
-                // Block chainHeight
-                block.height = chainHeight + 1;
-                console.log(chainHeight)
+            this.getBlockHeight().then((chainLength) => {
+                // Block chainLength
+                block.height = chainLength + 1;
                 block.time = Date.now();
-                if (block.chainHeight > -1) {
-                    console.log( this.getBlock(chainHeight).then((value) => {
+                if (chainLength > 0) {
+                   this.getBlock(chainLength).then((value) => {
                         let previousBlock = JSON.parse(value);
                         block.previousBlockHash = previousBlock.hash;
                         block.hash = SHA256(JSON.stringify(block)).toString();
-                        this.bd.addDataToLevelDB(block);
-                        resolve(block);
-                        console.log(block)
+                        console.log(this.bd.addDataToLevelDB(block).then((result) => {
+                            console.log(result);
+                            resolve(result)
+                        }).catch((err) => {
+                            console.log(err);
+                        }), 'addDataToLevelDB')
                     }).catch((err) => {
                         console.log(err);
                         reject(`${err} Failed with get previous block data !`);
-                    }));
+                    });
+                }else{
+                    console.log('else');
                 }
             }).catch((err) => {
                 console.log(err);
@@ -79,6 +84,7 @@ class Blockchain {
             });;
         });
     }
+
 
 
     // Get Block By Height

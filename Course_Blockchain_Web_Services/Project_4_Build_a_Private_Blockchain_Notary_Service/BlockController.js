@@ -91,7 +91,7 @@ class BlockController {
         this.app.post("/message-signature/validate", (req, res) => {
             const walletAddress = req.body.address;
             const signature = req.body.signature;
-            const requestTimeStamp = Date.now();;
+            const requestTimeStamp = Date.now();
             let validRequest = false
             if (this.memPool[`${walletAddress}`]) {
                 const isValidRequest = {

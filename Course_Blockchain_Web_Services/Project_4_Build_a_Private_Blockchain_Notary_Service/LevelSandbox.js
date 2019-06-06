@@ -9,7 +9,6 @@ const db = level(chainDB);
 class LevelSandbox {
 
     constructor() {
-        this.db = level(chainDB);
     }
 
     // Get data from levelDB with key (Promise)
@@ -73,12 +72,14 @@ class LevelSandbox {
     addDataToLevelDB(data) {
         let self = this;
         let i = 0;
-        console.log(data)
+        console.log(data, data)
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
             db.createReadStream()
                 .on('data', function (data) {
                     i++;
+                    console.log(`${data} data`)
+
                 })
                 .on('error', function (err) {
                     console.log('Failed to read stream!', err)
@@ -88,6 +89,8 @@ class LevelSandbox {
                     console.log(`Adding Block....${i}`, data);
                     self.addLevelDBData(i, data).then((result) => {
                         resolve(result)
+                        console.log(`${result} result`)
+
                     }).catch((err) => {
                         console.log(`${err} try`)
                     });
