@@ -31,57 +31,49 @@ class Blockchain {
     getBlockHeight() {
         // Add your code here
         return new Promise((resolve, reject) => {
-            console.log(this.bd.getBlocksCount().then((chainHeight) => {
-                console.log(chainHeight)
-                if (chainHeight - 1 <= 0) {
+            this.bd.getBlocksCount().then((chainLength) => {
+                if (chainLength - 1 <= 0) {
+                    console.log(0)
+
                     resolve(0);
-                    console.log('chainHeight - 1 <= 0')
                 } else {
-                    resolve(chainHeight - 1);
-                    console.log('chainHeight - 1')
+                    console.log(chainLength - 1)
+                    resolve(chainLength - 1);
                 }
-            }).catch((err) => {
-                console.log(err);
-                console.log(chainHeight)
-                reject(chainHeight)
-                res.send(`GETTING block Count failed ${err}`);
-            }));
+            });
         });
 
     }
+
     // Add new block
     addBlock(block) {
         // Add your code here
         // let self = this;
-        console.log(block, 'addBlock')
+        console.log(block)
 
-        console.log(new Promise((resolve, reject) => {
-            console.log(this.getBlockHeight().then((chainLength) => {
+        return new Promise((resolve, reject) => {
+            this.getBlockHeight().then((chainLength) => {
                 // Block chainLength
                 block.height = chainLength + 1;
-                block.time = Date.now();
-                if (chainLength > 0) {
-                    this.getBlock(chainLength - 1).then((blockData) => {
-                        const previousBlock = JSON.parse(blockData);
+                block.time = new Date().getTime().toString().slice(0, -3);
+                if (block.chainLength > -1) {
+                    this.getBlock(chainLength).then((value) => {
+                        let previousBlock = JSON.parse(value);
                         block.previousBlockHash = previousBlock.hash;
-                        // Block hash with SHA256 using newBlock and converting to a string
                         block.hash = SHA256(JSON.stringify(block)).toString();
-                        // Adding block object to chain
                         this.bd.addDataToLevelDB(block);
                         resolve(block);
-                    }, (error) => {
-                        console.log('get block failed !!!!!', error);
+                    }).catch((err) => {
+                        console.log(err);
+                        reject(`${err} Failed with get previous block data !`);
                     });
-                } else {
-                    console.log('else');
                 }
             }).catch((err) => {
                 console.log(err);
                 reject(`${err}Failed with Add block !!`);
-            }));;
-        }), 'addBlock Promise');
+            });;
+        });
     }
-
 
 
     // Get Block By Height
@@ -93,6 +85,7 @@ class Blockchain {
                 if (height >= 0 && height <= blockHeight) {
                     resolve(self.bd.getBlock(height));
                 } else {
+                    console.log(' Block height is invalid!');
                     reject(' Block height is invalid!');
                 }
             });
@@ -115,6 +108,8 @@ class Blockchain {
                 if (validBlockHash === blockHash) {
                     resolve(true);
                 } else {
+                    console.log(' true');
+
                     reject(true);
                 }
             });
@@ -126,8 +121,8 @@ class Blockchain {
         // Add your code here
         const ChainPD = [];
         const chainLinkValidations = [];
-        this.bd.getBlocksCount().then((chainHeight) => {
-            for (var i = 0; i < chainHeight - 1; i++) {
+        this.bd.getBlocksCount().then((chainLength) => {
+            for (var i = 0; i < chainLength - 1; i++) {
                 ChainPD.push(this.validateBlock(i));
                 const currentBlockData = this.getBlockOnHeight(i);
                 const nextBlockData = this.getBlockOnHeight(i + 1);
@@ -142,16 +137,15 @@ class Blockchain {
         }).catch((error) => {
             console.log(error);
         });
-        console.log( new Promise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
             Promise.all(ChainPD).then(() => {
                 resolve(chainLinkValidations);
             }, (error) => {
                 console.log('Error with validation' + error);
-
-                reject(`Error with validation'! ${error}`);
+                reject('Error with validation' + error);
 
             });
-        }));
+        });
 
     }
 

@@ -1,7 +1,6 @@
 /* ===== Persist data with LevelDB ==================
 |  Learn more: level: https://github.com/Level/level |
 /===================================================*/
-
 const level = require('level');
 const chainDB = './chaindata';
 const db = level(chainDB);
@@ -31,9 +30,6 @@ class LevelSandbox {
     // Add data to levelDB with key and value (Promise)
     addLevelDBData(key, value) {
         let self = this;
-        console.log(value)
-        console.log(key)
-
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject() 
             db.put(key, JSON.stringify(value), function (success, err) {
@@ -42,7 +38,6 @@ class LevelSandbox {
                     reject(`(${key},${value}) Error with Put!`);
                 }
                 resolve(` ${JSON.stringify(value)}`);
-                console.log(value)
             });
         });
     }
@@ -53,9 +48,8 @@ class LevelSandbox {
         const dataArray = [];
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
-          db.createReadStream()
+            db.createReadStream()
                 .on('data', function (data) {
-                    console.log(data)
                     dataArray.push(data);
                 })
                 .on('error', function (err) {
@@ -63,8 +57,6 @@ class LevelSandbox {
                 })
                 .on('close', function () {
                     resolve(dataArray.length);
-                    console.log(dataArray.length)
-
                 });
         });
     }
@@ -72,14 +64,11 @@ class LevelSandbox {
     addDataToLevelDB(data) {
         let self = this;
         let i = 0;
-        console.log(data, data)
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
             db.createReadStream()
                 .on('data', function (data) {
                     i++;
-                    console.log(`${data} data`)
-
                 })
                 .on('error', function (err) {
                     console.log('Failed to read stream!', err)
@@ -89,8 +78,6 @@ class LevelSandbox {
                     console.log(`Adding Block....${i}`, data);
                     self.addLevelDBData(i, data).then((result) => {
                         resolve(result)
-                        console.log(`${result} result`)
-
                     }).catch((err) => {
                         console.log(`${err} try`)
                     });
@@ -98,37 +85,21 @@ class LevelSandbox {
     });
 }
 
-// Get block by height
-
 getBlock(height) {
     let self = this;
     return new Promise(function (resolve, reject) {
         self.getLevelDBData(height)
             .then((result) => {
                 resolve(result);
+            }).catch((err) => {
+                console.log(err);
+                reject(`get block failed ${err}`);
             });
+
     });
 }
 
-// Get block by hash
-getBlockByHash(hash) {
-    let self = this;
-    let block = null;
-    return new Promise(function(resolve, reject){
-        db.createReadStream()
-        .on('data', function (data) {
-            if(data.hash === hash){
-                block = data;
-            }
-        })
-        .on('error', function (err) {
-            reject(err)
-        })
-        .on('close', function () {
-            resolve(block);
-        });
-    });
-}
+
 
 // Get Address
 
@@ -140,8 +111,9 @@ getAddress(address) {
             console.log(err)
           reject(err);
         } else {
+            console.log(JSON.parse(JSON.stringify(value)), 'lol')
+
           resolve(JSON.parse(JSON.stringify(value)));
-          console.log(JSON.parse(JSON.stringify(value)), 'lol')
         }
       });
     })

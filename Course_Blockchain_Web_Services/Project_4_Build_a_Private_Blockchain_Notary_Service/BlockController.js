@@ -119,7 +119,7 @@ class BlockController {
                         }
                     }
 
-                     this.memPool[walletAddress] = {
+                    this.memPool[walletAddress] = {
                         ...isValidRequest
                     };
                     // Remove in valid req after 30 Minutes 
@@ -248,26 +248,24 @@ class BlockController {
                 const data = {
                     ...req.body
                 }
-                // let data = req.body
-                // console.log(this.memPool && this.memPool[walletAddress], 'Lol')
-                
-                    if (Array.isArray(data.star)) {
-                        res.status(406).end();
-                    } else {
-                        //  Encoding hex To ascii for
-                        data.star.story = Buffer.from(data.star.story).toString('base64');
-                        let newBlock = new Block.Block(data);
-                        console.log(newBlock, 'Before');
-                        console.log(this.blockChain.addBlock(newBlock).then((block) => {
-                            console.log(block, 'After');
-                            res.JSON(`Adding block sucssed' ,${block}`)
-                            // res.send(newBlock)
-                        }).catch((err) => {
-                            // console.log(err);
-                            res.send(`Adding block failed ${err}`);
-                        }), 'frist promise ');
-                    }
-                
+                if (Array.isArray(data.star)) {
+                    console.log(newBlock, 'Array');
+                    res.status(406).end();
+                } else {
+                    //  Encoding hex To ascii for
+                    data.star.story = Buffer.from(data.star.story).toString('base64');
+                    let newBlock = new Block.Block(data);
+                    console.log(newBlock, 'Before');
+                    this.blockChain.addBlock(newBlock).then((block) => {
+                        return block
+                        // res.JSON(`Adding block sucssed' ,${block}`)
+                        // res.send(newBlock)
+                    }).catch((err) => {
+                        console.log(err);
+                        // res.send(`Adding block failed ${err}`);
+                    });
+                }
+
             } else {
                 res.status(400).end();
             }
