@@ -242,23 +242,21 @@ class BlockController {
         let self = this;
         this.app.post("/block", (req, res) => {
             // Add your code here
-            if (req.body) {
-                console.log(req.body);
+            if (req.body.data) {
+                console.log(req.body.data);
                 // to opject 
-                const data = {
-                    ...req.body
-                }
-                if (Array.isArray(data.star)) {
-                    console.log(newBlock, 'Array');
+
+                if (Array.isArray(req.body.data.star)) {
+                    console.log(req.body.data.star, 'Array');
                     res.status(406).end();
                 } else {
                     //  Encoding hex To ascii for
-                    data.star.story = Buffer.from(data.star.story).toString('base64');
-                    let newBlock = new Block.Block(data);
+                    req.body.data.star.story = Buffer.from(req.body.data.star.story).toString('base64');
+                    let newBlock = new Block.Block(req.body.data);
                     console.log(newBlock, 'Before');
                     this.blockChain.addBlock(newBlock).then((block) => {
-                        return block
-                        // res.JSON(`Adding block sucssed' ,${block}`)
+                        // return block
+                        res.JSON(`Adding block sucssed' ,${block}`)
                         // res.send(newBlock)
                     }).catch((err) => {
                         console.log(err);

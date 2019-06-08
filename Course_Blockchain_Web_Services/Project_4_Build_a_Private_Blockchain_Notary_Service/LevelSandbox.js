@@ -30,6 +30,7 @@ class LevelSandbox {
     // Add data to levelDB with key and value (Promise)
     addLevelDBData(key, value) {
         let self = this;
+        console.log(value)
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject() 
             db.put(key, JSON.stringify(value), function (success, err) {
@@ -64,6 +65,7 @@ class LevelSandbox {
     addDataToLevelDB(data) {
         let self = this;
         let i = 0;
+        console.log(data)
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
             db.createReadStream()
