@@ -249,20 +249,17 @@ class BlockController {
                     ...req.body
                 }
                 // let data = req.body
-                let walletAddress = req.body.address
-
-                console.log(this.memPool && this.memPool[walletAddress], 'Lol')
-                if (this.memPool && this.memPool[walletAddress]) {
+                // console.log(this.memPool && this.memPool[walletAddress], 'Lol')
+                
                     if (Array.isArray(data.star)) {
                         res.status(406).end();
                     } else {
                         //  Encoding hex To ascii for
-                        data.star.story = new Buffer.from(data.star.story).toString('base64');
+                        data.star.story = Buffer.from(data.star.story).toString('base64');
                         let newBlock = new Block.Block(data);
                         console.log(newBlock, 'Before');
-                        console.log(self.blockChain.addBlock(newBlock).then((block) => {
+                        console.log(this.blockChain.addBlock(newBlock).then((block) => {
                             console.log(block, 'After');
-                            delete this.memPool[walletAddress];
                             res.JSON(`Adding block sucssed' ,${block}`)
                             // res.send(newBlock)
                         }).catch((err) => {
@@ -270,9 +267,7 @@ class BlockController {
                             res.send(`Adding block failed ${err}`);
                         }), 'frist promise ');
                     }
-                } else {
-                    res.status(401).end();
-                }
+                
             } else {
                 res.status(400).end();
             }

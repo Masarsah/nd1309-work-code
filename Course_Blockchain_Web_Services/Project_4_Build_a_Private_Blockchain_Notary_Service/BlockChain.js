@@ -31,7 +31,7 @@ class Blockchain {
     getBlockHeight() {
         // Add your code here
         return new Promise((resolve, reject) => {
-            this.bd.getBlocksCount().then((chainHeight) => {
+            console.log(this.bd.getBlocksCount().then((chainHeight) => {
                 console.log(chainHeight)
                 if (chainHeight - 1 <= 0) {
                     resolve(0);
@@ -41,11 +41,11 @@ class Blockchain {
                     console.log('chainHeight - 1')
                 }
             }).catch((err) => {
-                // console.log(err);
+                console.log(err);
                 console.log(chainHeight)
                 reject(chainHeight)
                 res.send(`GETTING block Count failed ${err}`);
-            });
+            }));
         });
 
     }
@@ -53,36 +53,33 @@ class Blockchain {
     addBlock(block) {
         // Add your code here
         // let self = this;
-        console.log(block, 'second')
+        console.log(block, 'addBlock')
 
-        return new Promise((resolve, reject) => {
-            this.getBlockHeight().then((chainLength) => {
+        console.log(new Promise((resolve, reject) => {
+            console.log(this.getBlockHeight().then((chainLength) => {
                 // Block chainLength
                 block.height = chainLength + 1;
                 block.time = Date.now();
                 if (chainLength > 0) {
-                   this.getBlock(chainLength).then((value) => {
-                        let previousBlock = JSON.parse(value);
+                    this.getBlock(chainLength - 1).then((blockData) => {
+                        const previousBlock = JSON.parse(blockData);
                         block.previousBlockHash = previousBlock.hash;
+                        // Block hash with SHA256 using newBlock and converting to a string
                         block.hash = SHA256(JSON.stringify(block)).toString();
-                        console.log(this.bd.addDataToLevelDB(block).then((result) => {
-                            console.log(result);
-                            resolve(result)
-                        }).catch((err) => {
-                            console.log(err);
-                        }), 'addDataToLevelDB')
-                    }).catch((err) => {
-                        console.log(err);
-                        reject(`${err} Failed with get previous block data !`);
+                        // Adding block object to chain
+                        this.bd.addDataToLevelDB(block);
+                        resolve(block);
+                    }, (error) => {
+                        console.log('get block failed !!!!!', error);
                     });
-                }else{
+                } else {
                     console.log('else');
                 }
             }).catch((err) => {
                 console.log(err);
                 reject(`${err}Failed with Add block !!`);
-            });;
-        });
+            }));;
+        }), 'addBlock Promise');
     }
 
 
@@ -145,15 +142,16 @@ class Blockchain {
         }).catch((error) => {
             console.log(error);
         });
-        return new Promise(function (resolve, reject) {
+        console.log( new Promise(function (resolve, reject) {
             Promise.all(ChainPD).then(() => {
                 resolve(chainLinkValidations);
             }, (error) => {
+                console.log('Error with validation' + error);
+
                 reject(`Error with validation'! ${error}`);
 
-                console.log('Error with validation' + error);
             });
-        });
+        }));
 
     }
 

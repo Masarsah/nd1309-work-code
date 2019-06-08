@@ -137,6 +137,7 @@ getAddress(address) {
     return new Promise((resolve, reject) => {
         db.get(address, function (err, value) {
         if (err) {
+            console.log(err)
           reject(err);
         } else {
           resolve(JSON.parse(JSON.stringify(value)));
