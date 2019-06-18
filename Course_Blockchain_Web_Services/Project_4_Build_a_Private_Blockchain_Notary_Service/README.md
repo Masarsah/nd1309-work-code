@@ -23,15 +23,17 @@ http://localhost:8000/  to be able to test the endpoint , you could use Postman:
     ```
     http://localhost:8000/requestValidation
     ```
-    ```
-curl -X POST \
+    
+    
+
+```curl -X POST \
   http://localhost:8000/requestValidation \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
     "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL"
 }'
-    ```
+```
     
 Sucsseful Responce :
    ``` 
@@ -51,7 +53,7 @@ Sucsseful Responce :
  ```
 http://localhost:8000/message-signature/validate
 ```
-Sucsseful Responce :
+
   ``` curl -X POST \
   http://localhost:8000/message-signature/validate \
   -H 'Content-Type: application/json' \
@@ -61,7 +63,7 @@ Sucsseful Responce :
  "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
 }'
 ```
-
+Sucsseful Responce :
 ```{
     "registerStar": true,
     "status": {
