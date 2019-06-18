@@ -27,51 +27,40 @@ http://localhost:8000/  to be able to test the endpoint , you could use Postman:
      
      2.  Validate Message Signature.
      
-     Method
-     
-     `POST `
+     Method    `POST `
      
  ```
 http://localhost:8000/message-signature/validate
 ```
 
-     3.  Adds a new block to the database.
+   3.  Adds a new block to the database.
      
-  Method
+  Method `POST `
      
-     `POST `
+```http://localhost:8000/block
+```
+    
+  4. returns a Block from the database by Height.
      
-  ```
-http://localhost:8000/block
-    ```
+  Method  `GET `
      
-     4. returns a Block from the database by Height.
-     
-  Method
-     
-     `GET `
-     
-     ```
+```
 http://localhost:8000/block/[height]
 ```
 
+ 5. returns a Block from the database by Wallet Address .
+     
+Method  `GET `
 
-     5. returns a Block from the database by Wallet Address .
-     
-               Method
-     
-     `GET `
-     ```
-http://localhost:8000/stars/address:[ADDRESS]
+```http://localhost:8000/stars/address:[ADDRESS]
 ```
 
      
-     6.  returns a Block from the database by Star Block Hash .
-               Method
+ 6.  returns a Block from the database by Star Block Hash .
+               Method `GET `
      
-     `GET `
-     
-     ```
+
+```
 http://localhost:8000/stars/hash:[HASH]
 ```
 
