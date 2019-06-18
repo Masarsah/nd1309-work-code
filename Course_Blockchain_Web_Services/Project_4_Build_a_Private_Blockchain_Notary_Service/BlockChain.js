@@ -30,8 +30,9 @@ class Blockchain {
     // Get block height, it is a helper method that return the height of the blockchain
     getBlockHeight() {
         // Add your code here
+        let self = this;
         return new Promise((resolve, reject) => {
-            this.bd.getBlocksCount().then((chainLength) => {
+            self.bd.getBlocksCount().then((chainLength) => {
                 if (chainLength - 1 <= 0) {
                     console.log(0)
 
@@ -40,6 +41,8 @@ class Blockchain {
                     console.log(chainLength - 1)
                     resolve(chainLength - 1);
                 }
+            }).catch((err) => {
+                console.log('error getBlock', `${err}`)
             });
         });
 
@@ -48,20 +51,21 @@ class Blockchain {
     // Add new block
     addBlock(block) {
         // Add your code here
-        // let self = this;
+        let self = this;
         console.log(block)
 
         return new Promise((resolve, reject) => {
-            this.getBlockHeight().then((chainLength) => {
+            return self.getBlockHeight().then((chainLength) => {
                 // Block chainLength
                 block.height = chainLength + 1;
                 block.time = new Date().getTime().toString().slice(0, -3);
                 if (block.chainLength > -1) {
-                    this.getBlock(chainLength).then((value) => {
+                    return self.getBlock(chainLength).then((value) => {
                         let previousBlock = JSON.parse(value);
                         block.previousBlockHash = previousBlock.hash;
                         block.hash = SHA256(JSON.stringify(block)).toString();
-                        this.bd.addDataToLevelDB(block);
+                        self.bd.addDataToLevelDB(block);
+                        console.log(block);
                         resolve(block);
                     }).catch((err) => {
                         console.log(err);
@@ -83,11 +87,18 @@ class Blockchain {
         return new Promise(function (resolve, reject) {
             self.getBlockHeight().then((blockHeight) => {
                 if (height >= 0 && height <= blockHeight) {
-                    resolve(self.bd.getBlock(height));
+                    resolve(self.bd.getBlock(height).then((blockHeight) => {
+                        blockHeight
+                    }).catch((err) => {
+                        console.log('error getBlock', `${err}`)
+                    })
+                    );
                 } else {
                     console.log(' Block height is invalid!');
                     reject(' Block height is invalid!');
                 }
+            }).catch((err) => {
+                console.log('error getBlock', `${err}`)
             });
         });
 

@@ -90,8 +90,7 @@ class LevelSandbox {
 getBlock(height) {
     let self = this;
     return new Promise(function (resolve, reject) {
-        self.getLevelDBData(height)
-            .then((result) => {
+        self.getLevelDBData(height).then((result) => {
                 resolve(result);
             }).catch((err) => {
                 console.log(err);

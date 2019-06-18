@@ -203,7 +203,7 @@ class BlockController {
     getBlockByHash() {
         let self = this;
 
-        self.app.get("/block/hash:{HASH}", (req, res) => {
+        self.app.get("/stars/hash:{HASH}", (req, res) => {
             // Add your code here
             let hash = req.params.hash
             // console.log(req.params.hash)
@@ -221,7 +221,7 @@ class BlockController {
     getBlockByAddress() {
         let self = this;
 
-        self.app.get("/block/address:{address}", (req, res) => {
+        self.app.get("/stars/address:{address}", (req, res) => {
             // Add your code here
             let walletAddress = req.params.address
             console.log(req.params.address)
@@ -239,7 +239,6 @@ class BlockController {
      * Implement a POST Endpoint to add a new Block, url: "/block"
      */
     postNewBlock() {
-        let self = this;
         this.app.post("/block", (req, res) => {
             // Add your code here
             if (req.body.data) {
