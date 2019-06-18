@@ -107,7 +107,8 @@ http://localhost:8000/block/[height]
      
 Method  `GET `
 
-```http://localhost:8000/stars/address:[ADDRESS]
+```
+http://localhost:8000/stars/address:[ADDRESS]
 ```
 
      
