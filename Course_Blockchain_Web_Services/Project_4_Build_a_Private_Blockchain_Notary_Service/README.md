@@ -1,6 +1,6 @@
 # Project #4. Build a Private Blockchain Notary Service
 
-This is Project 4, Connect Private Blockchain to Front-End Client via APIs, in this project I created the GET and POST endpoint using node Express framework  .
+This is Project 4, In this project,I build a Star Registry Service that allows users to claim ownership of their favorite star in the night sky. .
 
 ## Setup project for Review.
 
@@ -17,20 +17,61 @@ http://localhost:8000/  to be able to test the endpoint , you could use Postman:
 *  to Test this routes in Postman:
 
 
-     1.  Validate User Request
+ 1.  Validate User Request
          
-         Method
-          `POST `
+  Method  `POST `
     ```
     http://localhost:8000/requestValidation
     ```
-     
-     2.  Validate Message Signature.
+    ```
+curl -X POST \
+  http://localhost:8000/requestValidation \
+  -H 'Content-Type: application/json' \
+  -H 'cache-control: no-cache' \
+  -d '{
+    "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL"
+}'
+    ```
+    
+Sucsseful Responce :
+   ``` 
+   {
+    "walletAddress": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+    "requestTimeStamp": "1541605128",
+    "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
+    "validationWindow": 300
+}
+```
+
+2.  Validate Message Signature.
      
      Method    `POST `
      
+ 
  ```
 http://localhost:8000/message-signature/validate
+```
+Sucsseful Responce :
+  ``` curl -X POST \
+  http://localhost:8000/message-signature/validate \
+  -H 'Content-Type: application/json' \
+  -H 'cache-control: no-cache' \
+  -d '{
+"address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+ "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
+}'
+```
+
+```{
+    "registerStar": true,
+    "status": {
+        "address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+        "requestTimeStamp": "1541605128",
+        "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
+        "validationWindow": 200,
+        "messageSignature": true
+    }
+}
 ```
 
    3.  Adds a new block to the database.
