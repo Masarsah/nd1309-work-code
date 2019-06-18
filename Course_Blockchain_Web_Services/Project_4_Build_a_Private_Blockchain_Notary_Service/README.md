@@ -1,4 +1,4 @@
-# Project #3. Connect Private Blockchain to Front-End Client via APIs
+# Project #4. Build a Private Blockchain Notary Service
 
 This is Project 3, Connect Private Blockchain to Front-End Client via APIs, in this project I created the GET and POST endpoint using node Express framework  .
 
@@ -17,35 +17,58 @@ http://localhost:8000/  to be able to test the endpoint , you could use Postman:
 *  to Test this routes in Postman:
 
 
-     1.  `POST ` - Validate User Request
-     
+     1.  Validate User Request
+         
+         Method
+          `POST `
     ```
     http://localhost:8000/requestValidation
     ```
      
-     2.  `POST ` -Validate Message Signature
-         ```
+     2.  Validate Message Signature
+     
+     Method
+     
+     `POST `
+     
+ ```
 http://localhost:8000/message-signature/validate
-    ```
+```
 
-     3.  `POST ` - adds a new block to the database.
+     3.  adds a new block to the database.
+     
+          Method
+     
+     `POST `
               ```
 http://localhost:8000/block
     ```
      
-     4.  `GET /block/0` - returns a Block from the database by Height .
+     4. returns a Block from the database by Height .
+     
+          Method
+     
+     `GET `
      ```
 http://localhost:8000/block/[height]
 ```
 
 
-     5.  `GET /stars/address:[ADDRESS]` - returns a Block from the database by Wallet Address .
+     5. returns a Block from the database by Wallet Address .
+     
+               Method
+     
+     `GET `
      ```
 http://localhost:8000/stars/address:[ADDRESS]
 ```
 
      
-     6.  `GET /stars/hash:[HASH]` - returns a Block from the database by Star Block Hash .
+     6.  returns a Block from the database by Star Block Hash .
+               Method
+     
+     `GET `
+     
      ```
 http://localhost:8000/stars/hash:[HASH]
 ```
