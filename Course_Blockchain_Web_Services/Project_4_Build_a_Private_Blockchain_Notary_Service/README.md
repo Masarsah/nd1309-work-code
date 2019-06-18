@@ -80,7 +80,19 @@ Sucsseful Responce :
      
   Method `POST `
      
-```http://localhost:8000/block
+```
+http://localhost:8000/block
+```
+
+```
+{
+"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+    "star": {
+            "dec": "68° 52' 56.9",
+            "ra": "16h 29m 1.0s",
+            "story": "Found star using https://www.google.com/sky/"
+        }
+}
 ```
     
   4. returns a Block from the database by Height.
