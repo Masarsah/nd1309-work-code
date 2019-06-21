@@ -57,6 +57,7 @@ class LevelSandbox {
                     reject(err)
                 })
                 .on('close', function () {
+                    console.log(dataArray.length)
                     resolve(dataArray.length);
                 });
         });
@@ -105,7 +106,6 @@ getBlock(height) {
 // Get Address
 
 getAddress(address) {
-    let self = this;
     return new Promise((resolve, reject) => {
         db.get(address, function (err, value) {
         if (err) {

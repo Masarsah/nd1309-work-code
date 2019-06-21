@@ -7,7 +7,7 @@ const bitcoinMessage = require('bitcoinjs-message');
 
 
 
-const TimeoutRequestsWindowTime = 300000;
+const TimeoutRequestsWindowTime = 3000000;
 const ValidTimeoutRequestsWindowTime = 180000;
 /**
  * Controller Definition to encapsulate routes to work with blocks
@@ -51,17 +51,20 @@ class BlockController {
                 let response = {
                     "walletAddress": req.body.address,
                     "requestTimeStamp": requestTimeStamp,
-                    "message": `[${req.body.address}]:[${requestTimeStamp}]:StarRegistry`,
+                    "message": `${req.body.address}:${requestTimeStamp}:StarRegistry`,
                     "validationWindow": 300,
                 }
                 if (this.timeoutRequests[walletAddress]) { // Request is already in mempool.
                     console.log(this.timeoutRequests[walletAddress])
                     const TimeoutRequestsWindowTime = this.timeoutRequests[walletAddress];
-                    const timeElapse = (requestTimeStamp - TimeoutRequestsWindowTime.requestTimeStamp);
+                    console.log(TimeoutRequestsWindowTime)
+
+                    const timeElapse = (TimeoutRequestsWindowTime.requestTimeStamp - requestTimeStamp);
+                    console.log(timeElapse)
                     TimeoutRequestsWindowTime.validationWindow = TimeoutRequestsWindowTime.validationWindow - timeElapse;
                     TimeoutRequestsWindowTime.requestTimeStamp = requestTimeStamp;
                     // Re-created this message since the timestamp is changed.
-                    TimeoutRequestsWindowTime.message = `[${walletAddress}]:[${requestTimeStamp}]:StarRegistry`
+                    TimeoutRequestsWindowTime.message = `${walletAddress}:${requestTimeStamp}:StarRegistry`
                     response = TimeoutRequestsWindowTime;
                 } else {
                     this.timeoutRequests[walletAddress] = response;
@@ -74,7 +77,7 @@ class BlockController {
                             delete this.timeoutRequests[`${walletAddress} `];
 
                         }
-                    }, TimeoutRequestsWindowTime); // 5 Minute window ( time in milliseconds)                    else {
+                    }, TimeoutRequestsWindowTime); // 5 Minute window ( time in milliseconds)  
 
                 }
                 res.send(response);
@@ -113,7 +116,7 @@ class BlockController {
                         "status": {
                             "address": walletAddress,
                             "requestTimeStamp": requestTimeStamp,
-                            "message": `[${signature}]:[${requestTimeStamp}]:starRegistry`,
+                            "message": `${signature}:${requestTimeStamp}:starRegistry`,
                             "validationWindow": this.timeoutRequests[walletAddress].validationWindow,
                             "messageSignature": validRequest
                         }
@@ -133,7 +136,7 @@ class BlockController {
                     if (this.timeoutRequests[walletAddress]) {
                         delete this.timeoutRequests[walletAddress];
                     }
-                    res.json(JSON.stringify(isValidRequest));
+                    res.json(isValidRequest);
                     // return isValidRequest
                     // console.log(isvalidRequest)
                     console.log(JSON.parse(JSON.stringify(isValidRequest)))
@@ -196,6 +199,23 @@ class BlockController {
         });
     }
 
+    // async  getBlockByIndex() {
+    //     let key = req.params.index
+    //     try {
+    //         let result = await this.blockChain.getBlock(key)
+    //         const block = JSON.parse(result);
+    //         // Decoding ascii To hex  
+    //         block.body.star.storyDecoded = new Buffer(block.body.star.story, 'base64').toString();
+    //         res.json(result)
+    //         console.log(result)
+    //     } catch (err) {
+    //         throw res.status(404).end()
+    //     }
+    // }
+
+
+
+
 
     /**
          * Implement a GET Endpoint to retrieve a block by hash, url: "/block/hash:{HASH}"
@@ -238,7 +258,38 @@ class BlockController {
     /**
      * Implement a POST Endpoint to add a new Block, url: "/block"
      */
-    postNewBlock() {
+    // postNewBlock() {
+    //     this.app.post("/block", (req, res) => {
+    //         // Add your code here
+    //         if (req.body.data) {
+    //             console.log(req.body.data);
+    //             // to opject 
+
+    //             if (Array.isArray(req.body.data.star)) {
+    //                 console.log(req.body.data.star, 'Array');
+    //                 res.status(406).end();
+    //             } else {
+    //                 //  Encoding hex To ascii for
+    //                 req.body.data.star.story = Buffer.from(req.body.data.star.story).toString('base64');
+    //                 let newBlock = new Block.Block(req.body.data);
+    //                 console.log(newBlock, 'Before');
+    //                 this.blockChain.addBlock(newBlock).then((block) => {
+    //                     // return block
+    //                     res.JSON(`Adding block sucssed' ,${block}`)
+    //                     // res.send(newBlock)
+    //                 }).catch((err) => {
+    //                     console.log(err);
+    //                     // res.send(`Adding block failed ${err}`);
+    //                 });
+    //             }
+
+    //         } else {
+    //             res.status(400).end();
+    //         }
+    //     })
+    // }
+
+        postNewBlock() {
         this.app.post("/block", (req, res) => {
             // Add your code here
             if (req.body.data) {
@@ -255,8 +306,9 @@ class BlockController {
                     console.log(newBlock, 'Before');
                     this.blockChain.addBlock(newBlock).then((block) => {
                         // return block
-                        res.JSON(`Adding block sucssed' ,${block}`)
+                        // res.JSON(`Adding block sucssed' ,${block}`)
                         // res.send(newBlock)
+                        console.log(block)
                     }).catch((err) => {
                         console.log(err);
                         // res.send(`Adding block failed ${err}`);
@@ -268,7 +320,6 @@ class BlockController {
             }
         })
     }
-
 
     /**
      * Helper method to initialize a Mock dataset. It adds 10 test blocks to the blocks array.

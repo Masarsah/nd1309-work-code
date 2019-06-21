@@ -42,41 +42,69 @@ class Blockchain {
                     resolve(chainLength - 1);
                 }
             }).catch((err) => {
-                console.log('error getBlock', `${err}`)
+                reject(console.log('error getBlock', `${err}`))
             });
         });
 
     }
 
-    // Add new block
-    addBlock(block) {
+    
+
+    // // Add new block
+    // addBlock(block) {
+    //     // Add your code here
+    //     let self = this;
+    //     console.log(block)
+
+    //     return new Promise((resolve, reject) => {
+    //         self.getBlockHeight()
+    //             .then((chainLength) => {
+    //                 // Block chainLength
+    //                 block.height = chainLength + 1;
+    //                 block.time = Date.now();
+    //                 if (block.chainLength > -1) {
+    //                     self.getBlock(chainLength)
+    //                         .then((value) => {
+    //                             let previousBlock = JSON.parse(value);
+    //                             block.previousBlockHash = previousBlock.hash;
+    //                             block.hash = SHA256(JSON.stringify(block)).toString();
+    //                              self.bd.addDataToLevelDB(block)
+    //                                 .then((block) => {
+    //                                     console.log(block);
+    //                                     resolve(block);
+    //                                 })
+    //                         })
+    //                 }
+    //             }).catch((err) => {
+    //                 console.log(err);
+    //                 reject(`${err}Failed with Add block !!`);
+    //             });;
+    //     });
+    // }
+
+
+    async addBlock(block) {
         // Add your code here
         let self = this;
         console.log(block)
+        try {
+            let chainLength = self.getBlockHeight()
+            console.log(chainLength)
+            // Block chainLength
+            block.height = chainLength + 1;
+            block.time = Date.now();
+            if (block.chainLength > -1) {
+                let value = self.getBlock(chainLength)
 
-        return new Promise((resolve, reject) => {
-            return self.getBlockHeight().then((chainLength) => {
-                // Block chainLength
-                block.height = chainLength + 1;
-                block.time = new Date().getTime().toString().slice(0, -3);
-                if (block.chainLength > -1) {
-                    return self.getBlock(chainLength).then((value) => {
-                        let previousBlock = JSON.parse(value);
-                        block.previousBlockHash = previousBlock.hash;
-                        block.hash = SHA256(JSON.stringify(block)).toString();
-                        self.bd.addDataToLevelDB(block);
-                        console.log(block);
-                        resolve(block);
-                    }).catch((err) => {
-                        console.log(err);
-                        reject(`${err} Failed with get previous block data !`);
-                    });
-                }
-            }).catch((err) => {
-                console.log(err);
-                reject(`${err}Failed with Add block !!`);
-            });;
-        });
+                let previousBlock = JSON.parse(value);
+                block.previousBlockHash = previousBlock.hash;
+                block.hash = SHA256(JSON.stringify(block)).toString();
+                let block = self.bd.addDataToLevelDB(block);
+                console.log(block);
+            }
+        } catch (err) {
+            throw res.status(404).end()
+        }
     }
 
 
@@ -89,8 +117,6 @@ class Blockchain {
                 if (height >= 0 && height <= blockHeight) {
                     resolve(self.bd.getBlock(height).then((blockHeight) => {
                         blockHeight
-                    }).catch((err) => {
-                        console.log('error getBlock', `${err}`)
                     })
                     );
                 } else {
