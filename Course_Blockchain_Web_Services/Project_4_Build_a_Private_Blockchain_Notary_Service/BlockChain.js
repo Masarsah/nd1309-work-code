@@ -50,62 +50,62 @@ class Blockchain {
 
     
 
-    // // Add new block
-    // addBlock(block) {
-    //     // Add your code here
-    //     let self = this;
-    //     console.log(block)
-
-    //     return new Promise((resolve, reject) => {
-    //         self.getBlockHeight()
-    //             .then((chainLength) => {
-    //                 // Block chainLength
-    //                 block.height = chainLength + 1;
-    //                 block.time = Date.now();
-    //                 if (block.chainLength > -1) {
-    //                     self.getBlock(chainLength)
-    //                         .then((value) => {
-    //                             let previousBlock = JSON.parse(value);
-    //                             block.previousBlockHash = previousBlock.hash;
-    //                             block.hash = SHA256(JSON.stringify(block)).toString();
-    //                              self.bd.addDataToLevelDB(block)
-    //                                 .then((block) => {
-    //                                     console.log(block);
-    //                                     resolve(block);
-    //                                 })
-    //                         })
-    //                 }
-    //             }).catch((err) => {
-    //                 console.log(err);
-    //                 reject(`${err}Failed with Add block !!`);
-    //             });;
-    //     });
-    // }
-
-
-    async addBlock(block) {
+    // Add new block
+    addBlock(block) {
         // Add your code here
         let self = this;
         console.log(block)
-        try {
-            let chainLength = self.getBlockHeight()
-            console.log(chainLength)
-            // Block chainLength
-            block.height = chainLength + 1;
-            block.time = Date.now();
-            if (block.chainLength > -1) {
-                let value = self.getBlock(chainLength)
 
-                let previousBlock = JSON.parse(value);
-                block.previousBlockHash = previousBlock.hash;
-                block.hash = SHA256(JSON.stringify(block)).toString();
-                let block = self.bd.addDataToLevelDB(block);
-                console.log(block);
-            }
-        } catch (err) {
-            throw res.status(404).end()
-        }
+        return new Promise((resolve, reject) => {
+            self.getBlockHeight()
+                .then((chainLength) => {
+                    // Block chainLength
+                    block.height = chainLength + 1;
+                    block.time = Date.now();
+                    if (block.chainLength > -1) {
+                        self.getBlock(chainLength)
+                            .then((value) => {
+                                let previousBlock = JSON.parse(value);
+                                block.previousBlockHash = previousBlock.hash;
+                                block.hash = SHA256(JSON.stringify(block)).toString();
+                                 self.bd.addDataToLevelDB(block)
+                                    .then((block) => {
+                                        console.log(block);
+                                        resolve(block);
+                                    })
+                            })
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    reject(`${err}Failed with Add block !!`);
+                });;
+        });
     }
+
+
+    // async addBlock(block) {
+    //     // Add your code here
+    //     let self = this;
+    //     console.log(block)
+    //     try {
+    //         let chainLength = self.getBlockHeight()
+    //         console.log(chainLength)
+    //         // Block chainLength
+    //         block.height = chainLength + 1;
+    //         block.time = Date.now();
+    //         if (block.chainLength > -1) {
+    //             let value = self.getBlock(chainLength)
+
+    //             let previousBlock = JSON.parse(value);
+    //             block.previousBlockHash = previousBlock.hash;
+    //             block.hash = SHA256(JSON.stringify(block)).toString();
+    //             let block = self.bd.addDataToLevelDB(block);
+    //             console.log(block);
+    //         }
+    //     } catch (err) {
+    //         throw res.status(404).end()
+    //     }
+    // }
 
 
     // Get Block By Height

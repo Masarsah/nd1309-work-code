@@ -100,6 +100,7 @@ class BlockController {
                 const isValidRequest = {
                     ...this.memPool[walletAddress]
                 };
+                console.log(isValidRequest.status.requestTimeStamp, 'lol')
                 const timeElapse = (requestTimeStamp - isValidRequest.status.requestTimeStamp);
                 isValidRequest.status.validationWindow = isValidRequest.status.validationWindow - timeElapse;
                 isValidRequest.status.requestTimeStamp = requestTimeStamp;
@@ -289,32 +290,38 @@ class BlockController {
     //     })
     // }
 
-        postNewBlock() {
+    postNewBlock() {
         this.app.post("/block", (req, res) => {
             // Add your code here
-            if (req.body.data) {
-                console.log(req.body.data);
+            if (req.body) {
+                console.log(req.body);
                 // to opject 
+                if (this.memPool && this.memPool[req.body.address]) {
+                    if (Array.isArray(req.body.star)) {
+                        console.log(req.body.star, 'Array');
+                        res.status(406).end();
+                    } else {
+                        //  Encoding hex To ascii for
+                        req.body.star.story = Buffer.from(req.body.star.story).toString('base64');
+                        let newBlock = new Block.Block(req.body);
+                        console.log(newBlock, 'Before');
+                        this.blockChain.addBlock(newBlock).then((block) => {
+                            // return block
+                            res.JSON(`Adding block sucssed' ,${block}`)
+                            // res.send(newBlock)
+                            delete this.memPool[walletAddress];
+                            delete this.timeoutRequests[walletAddress];
 
-                if (Array.isArray(req.body.data.star)) {
-                    console.log(req.body.data.star, 'Array');
-                    res.status(406).end();
+                            console.log(block)
+                        }).catch((err) => {
+                            console.log(err);
+                            // res.send(`Adding block failed ${err}`);
+                        });
+                    }
+
                 } else {
-                    //  Encoding hex To ascii for
-                    req.body.data.star.story = Buffer.from(req.body.data.star.story).toString('base64');
-                    let newBlock = new Block.Block(req.body.data);
-                    console.log(newBlock, 'Before');
-                    this.blockChain.addBlock(newBlock).then((block) => {
-                        // return block
-                        // res.JSON(`Adding block sucssed' ,${block}`)
-                        // res.send(newBlock)
-                        console.log(block)
-                    }).catch((err) => {
-                        console.log(err);
-                        // res.send(`Adding block failed ${err}`);
-                    });
+                    res.status(400).end();
                 }
-
             } else {
                 res.status(400).end();
             }
