@@ -100,7 +100,7 @@ class BlockController {
                 const isValidRequest = {
                     ...this.memPool[walletAddress]
                 };
-                console.log(isValidRequest.status.requestTimeStamp, 'lol')
+                console.log(isValidRequest.status, 'lol')
                 const timeElapse = (requestTimeStamp - isValidRequest.status.requestTimeStamp);
                 isValidRequest.status.validationWindow = isValidRequest.status.validationWindow - timeElapse;
                 isValidRequest.status.requestTimeStamp = requestTimeStamp;
@@ -142,6 +142,7 @@ class BlockController {
                     // console.log(isvalidRequest)
                     console.log(JSON.parse(JSON.stringify(isValidRequest)))
                 } else {
+                    console.log('error ');
                     res.status(404).end()
                     console.log("error not valid ")
                 }
@@ -190,33 +191,19 @@ class BlockController {
             // console.log(req.params.index)
             self.blockChain.getBlock(key).then((result) => {
                 // to opject
-                const block = JSON.parse(block);
+                const block = JSON.parse(result);
                 // Decoding ascii To hex  
-                block.body.star.storyDecoded = new Buffer(block.body.star.story, 'base64').toString();
-                res.json(result)
+                block.body.star.storyDecoded = Buffer.from(block.body.star.story, 'base64').toString('ascii')
+                res.json(block)
             }).catch((err) => {
+                console.log('error ', err);
+                res.json('block not found ')
                 throw res.status(404).end()
             });
         });
     }
 
-    // async  getBlockByIndex() {
-    //     let key = req.params.index
-    //     try {
-    //         let result = await this.blockChain.getBlock(key)
-    //         const block = JSON.parse(result);
-    //         // Decoding ascii To hex  
-    //         block.body.star.storyDecoded = new Buffer(block.body.star.story, 'base64').toString();
-    //         res.json(result)
-    //         console.log(result)
-    //     } catch (err) {
-    //         throw res.status(404).end()
-    //     }
-    // }
-
-
-
-
+    
 
     /**
          * Implement a GET Endpoint to retrieve a block by hash, url: "/block/hash:{HASH}"
@@ -224,13 +211,15 @@ class BlockController {
     getBlockByHash() {
         let self = this;
 
-        self.app.get("/stars/hash:{HASH}", (req, res) => {
+        self.app.get("/stars/hash::HASH", (req, res) => {
             // Add your code here
-            let hash = req.params.hash
+            let hash = req.params.HASH
             // console.log(req.params.hash)
-            self.db.getBlockByHash(hash).then((result) => {
+            self.blockChain.getBlockByHash(hash).then((result) => {
                 res.json(result)
             }).catch((err) => {
+                console.log('error ', err);
+
                 throw res.status(404).end()
             });
         });
@@ -242,14 +231,16 @@ class BlockController {
     getBlockByAddress() {
         let self = this;
 
-        self.app.get("/stars/address:{address}", (req, res) => {
+        self.app.get("/stars/address::address", (req, res) => {
             // Add your code here
             let walletAddress = req.params.address
             console.log(req.params.address)
-            if (req.params.address) {
-                self.db.getAddress(walletAddress).then((result) => {
+            if (walletAddress) {
+                self.blockChain.getBlockByAddress(walletAddress).then((result) => {
                     res.json(result)
                 }).catch((err) => {
+                    console.log('error ', err);
+                    res.send(`Invalid Address ${walletAddress}`)
                     throw res.status(404).end()
                 });
             }
@@ -259,46 +250,18 @@ class BlockController {
     /**
      * Implement a POST Endpoint to add a new Block, url: "/block"
      */
-    // postNewBlock() {
-    //     this.app.post("/block", (req, res) => {
-    //         // Add your code here
-    //         if (req.body.data) {
-    //             console.log(req.body.data);
-    //             // to opject 
-
-    //             if (Array.isArray(req.body.data.star)) {
-    //                 console.log(req.body.data.star, 'Array');
-    //                 res.status(406).end();
-    //             } else {
-    //                 //  Encoding hex To ascii for
-    //                 req.body.data.star.story = Buffer.from(req.body.data.star.story).toString('base64');
-    //                 let newBlock = new Block.Block(req.body.data);
-    //                 console.log(newBlock, 'Before');
-    //                 this.blockChain.addBlock(newBlock).then((block) => {
-    //                     // return block
-    //                     res.JSON(`Adding block sucssed' ,${block}`)
-    //                     // res.send(newBlock)
-    //                 }).catch((err) => {
-    //                     console.log(err);
-    //                     // res.send(`Adding block failed ${err}`);
-    //                 });
-    //             }
-
-    //         } else {
-    //             res.status(400).end();
-    //         }
-    //     })
-    // }
 
     postNewBlock() {
         this.app.post("/block", (req, res) => {
             // Add your code here
             if (req.body) {
                 console.log(req.body);
+                console.log(this.memPool && this.memPool[req.body.address]);
                 // to opject 
                 if (this.memPool && this.memPool[req.body.address]) {
                     if (Array.isArray(req.body.star)) {
                         console.log(req.body.star, 'Array');
+                        console.log('error Array');
                         res.status(406).end();
                     } else {
                         //  Encoding hex To ascii for
@@ -307,10 +270,10 @@ class BlockController {
                         console.log(newBlock, 'Before');
                         this.blockChain.addBlock(newBlock).then((block) => {
                             // return block
-                            res.JSON(`Adding block sucssed' ,${block}`)
+                            res.send(`Adding block sucssed' ,${block}`)
                             // res.send(newBlock)
-                            delete this.memPool[walletAddress];
-                            delete this.timeoutRequests[walletAddress];
+                            delete this.memPool[req.body.address];
+                            delete this.timeoutRequests[req.body.address];
 
                             console.log(block)
                         }).catch((err) => {
@@ -320,9 +283,13 @@ class BlockController {
                     }
 
                 } else {
+                    console.log('error');
+                    res.send('Request Validation again on http://localhost:8000/requestValidation')
                     res.status(400).end();
                 }
             } else {
+                console.log('error');
+                res.send('Make sure to write some data')
                 res.status(400).end();
             }
         })

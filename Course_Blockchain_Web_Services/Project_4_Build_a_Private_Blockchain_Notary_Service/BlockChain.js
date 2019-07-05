@@ -48,7 +48,7 @@ class Blockchain {
 
     }
 
-    
+
 
     // Add new block
     addBlock(block) {
@@ -60,20 +60,28 @@ class Blockchain {
             self.getBlockHeight()
                 .then((chainLength) => {
                     // Block chainLength
-                    block.height = chainLength + 1;
+                    block.height = chainLength;
                     block.time = Date.now();
-                    if (block.chainLength > -1) {
-                        self.getBlock(chainLength)
+                    // console.log(block.height > -1)
+                    if (block.height > 0) {
+                        console.log(chainLength)
+                        self.getBlock(chainLength - 1)
                             .then((value) => {
-                                let previousBlock = JSON.parse(value);
+                                console.log(value)
+                                const previousBlock = JSON.parse(value);
                                 block.previousBlockHash = previousBlock.hash;
                                 block.hash = SHA256(JSON.stringify(block)).toString();
-                                 self.bd.addDataToLevelDB(block)
+                                self.bd.addDataToLevelDB(block)
                                     .then((block) => {
                                         console.log(block);
                                         resolve(block);
                                     })
                             })
+                    } else {
+                        // Block hash 
+                        block.hash = SHA256(JSON.stringify(block)).toString();
+                        // Adding block to chain
+                        this.bd.addDataToLevelDB(block);
                     }
                 }).catch((err) => {
                     console.log(err);
@@ -83,29 +91,6 @@ class Blockchain {
     }
 
 
-    // async addBlock(block) {
-    //     // Add your code here
-    //     let self = this;
-    //     console.log(block)
-    //     try {
-    //         let chainLength = self.getBlockHeight()
-    //         console.log(chainLength)
-    //         // Block chainLength
-    //         block.height = chainLength + 1;
-    //         block.time = Date.now();
-    //         if (block.chainLength > -1) {
-    //             let value = self.getBlock(chainLength)
-
-    //             let previousBlock = JSON.parse(value);
-    //             block.previousBlockHash = previousBlock.hash;
-    //             block.hash = SHA256(JSON.stringify(block)).toString();
-    //             let block = self.bd.addDataToLevelDB(block);
-    //             console.log(block);
-    //         }
-    //     } catch (err) {
-    //         throw res.status(404).end()
-    //     }
-    // }
 
 
     // Get Block By Height
@@ -114,11 +99,9 @@ class Blockchain {
         let self = this;
         return new Promise(function (resolve, reject) {
             self.getBlockHeight().then((blockHeight) => {
+                console.log(blockHeight)
                 if (height >= 0 && height <= blockHeight) {
-                    resolve(self.bd.getBlock(height).then((blockHeight) => {
-                        blockHeight
-                    })
-                    );
+                    resolve(self.bd.getBlock(height));
                 } else {
                     console.log(' Block height is invalid!');
                     reject(' Block height is invalid!');
@@ -129,6 +112,39 @@ class Blockchain {
         });
 
     }
+
+    // Get Blocks By Address
+    getBlockByAddress(blockAddress) {
+        // Add your code here
+        const self = this;
+        console.log('getBlockByAddress: ', blockAddress);
+        return new Promise(function (resolve, reject) {
+            if (blockAddress) {
+                self.bd.getAddress(blockAddress).then((blocks) => {
+                    resolve(blocks);
+                });
+            } else {
+                reject('Invalid block address !');
+            }
+        });
+    }
+
+    // Get Blocks By hash
+    getBlockByHash(hash) {
+        // Add your code here
+        const self = this;
+        return new Promise(function (resolve, reject) {
+            if (hash) {
+                self.bd.getHash(hash).then((block) => {
+                    resolve(block);
+                });
+            } else {
+                console.log('err getBlockByHash')
+                reject('Invalid block hash !');
+            }
+        });
+    }
+
 
     // Validate if Block is being tampered by Block Height
     validateBlock(height) {
@@ -199,3 +215,4 @@ class Blockchain {
 }
 
 module.exports.Blockchain = Blockchain;
+

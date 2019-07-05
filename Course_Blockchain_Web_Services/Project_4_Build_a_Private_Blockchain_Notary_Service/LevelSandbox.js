@@ -12,14 +12,14 @@ class LevelSandbox {
 
     // Get data from levelDB with key (Promise)
     getLevelDBData(key) {
-        let self = this;
+        // let self = this;
         return new Promise(function (resolve, reject) {
             // Add your code here, remember in Promises you need to resolve() or reject()
             db.get(key, function (err, value) {
                 if (err) {
-                    reject('Error!');
                     console.log(`${key} Error !`, err);
 
+                    reject('Error!');
                 }
                 resolve(value, 'GET successed !!');
             });
@@ -45,20 +45,20 @@ class LevelSandbox {
 
     // Method that return the height
     getBlocksCount() {
-        let self = this;
         const dataArray = [];
         return new Promise(function (resolve, reject) {
+            let height = 0;
+
             // Add your code here, remember in Promises you need to resolve() or reject()
             db.createReadStream()
                 .on('data', function (data) {
-                    dataArray.push(data);
+                    height++;
                 })
                 .on('error', function (err) {
                     reject(err)
                 })
                 .on('close', function () {
-                    console.log(dataArray.length)
-                    resolve(dataArray.length);
+                    resolve(height + 1);
                 });
         });
     }
@@ -84,42 +84,70 @@ class LevelSandbox {
                     }).catch((err) => {
                         console.log(`${err} try`)
                     });
+                });
         });
-    });
-}
+    }
 
-getBlock(height) {
-    let self = this;
-    return new Promise(function (resolve, reject) {
-        self.getLevelDBData(height).then((result) => {
-                resolve(result);
+    getBlock(height) {
+        let self = this;
+        return new Promise(function (resolve, reject) {
+            self.getLevelDBData(height).then((result) => {
+                resolve(JSON.parse(JSON.stringify(result)));
             }).catch((err) => {
                 console.log(err);
                 reject(`get block failed ${err}`);
             });
 
-    });
-}
+        });
+    }
 
 
 
-// Get Address
+    // Get Address
+    getAddress(address) {
+        const blocks = []
+        return new Promise(function (resolve, reject) {
+            // Add your code here, remember in Promises you need to resolve() or reject()
+            db.createReadStream()
+                .on('data', function (data) {
+                    const block = JSON.parse(data.value)
+                    if (block.body.address === address) {
+                        block.body.star.storyDecoded = Buffer.from(block.body.star.story, 'base64').toString('ascii')
+                        blocks.push(block)
+                    }
+                })
+                .on('error', function (err) {
+                    reject(err)
+                })
+                .on('close', function () {
+                    resolve(blocks);
+                });
+        });
+    }
 
-getAddress(address) {
-    return new Promise((resolve, reject) => {
-        db.get(address, function (err, value) {
-        if (err) {
-            console.log(err)
-          reject(err);
-        } else {
-            console.log(JSON.parse(JSON.stringify(value)), 'lol')
+    // Get HAsh
+    getHash(hash) {
+        let block = null;
+        return new Promise(function (resolve, reject) {
+            // Add your code here, remember in Promises you need to resolve() or reject()
+            db.createReadStream()
+                .on('data', function (data) {
+                    const block = JSON.parse(data.value);
+                    if (block.hash === hash) {
 
-          resolve(JSON.parse(JSON.stringify(value)));
-        }
-      });
-    })
-  }
+                        block.body.star.storyDecoded = Buffer.from(block.body.star.story, 'base64').toString('ascii')
+                        return resolve(block)
 
+                    }
+                })
+                .on('error', function (err) {
+                    reject(err, 'block not found ')
+                })
+                .on('close', function () {
+                    resolve(block);
+                });
+        });
+    }
 
 
 }
