@@ -12,4 +12,4 @@ If you need to update Metamask just delete your Metamask extension and install i
 
 token name: Masarah
 token symbol: MAS
-contract address (rinkeby): 
+contract address (rinkeby): b4aec756b14349c181f23c72ce3355ea
