@@ -1,4 +1,4 @@
-const StarNotary = artifacts.require("StarNotary");
+let StarNotary = artifacts.require("StarNotary");
 
 var accounts;
 var owner;
@@ -66,9 +66,67 @@ it('lets user2 buy a star and decreases its balance in ether', async() => {
     await instance.createStar('awesome star', starId, {from: user1});
     await instance.putStarUpForSale(starId, starPrice, {from: user1});
     let balanceOfUser1BeforeTransaction = await web3.eth.getBalance(user2);
-    const balanceOfUser2BeforeTransaction = await web3.eth.getBalance(user2);
+    let balanceOfUser2BeforeTransaction = await web3.eth.getBalance(user2);
     await instance.buyStar(starId, {from: user2, value: balance, gasPrice:0});
-    const balanceAfterUser2BuysStar = await web3.eth.getBalance(user2);
+    let balanceAfterUser2BuysStar = await web3.eth.getBalance(user2);
     let value = Number(balanceOfUser2BeforeTransaction) - Number(balanceAfterUser2BuysStar);
     assert.equal(value, starPrice);
   });
+
+  //The token name and token symbol are added properly
+
+it('can add the star name and star symbol properly', async() => {
+    let instance = await StarNotary.deployed();
+    let tName = await instance.name.call();
+    let tSymbol = await instance.symbol.call();
+    assert.equal(tName, 'Masarah');
+    assert.equal(tSymbol, 'MAS');
+});
+  //2 users can exchange their stars 
+  it('lets 2 users exchange stars', async() => {
+    let instance = await StarNotary.deployed();
+    let user1 = accounts[1];
+    let user2 = accounts[2];
+
+    let starId1 = 6;
+    let starId2 = 7;
+
+    await instance.createStar('Create awesome Star 1', starId1, {from: user1});
+    await instance.createStar('Create awesome Star 2', starId2, {from: user2});
+
+    assert.equal(await instance.ownerOf.call(starId1), user1);
+    assert.equal(await instance.ownerOf.call(starId2), user2);
+
+    await instance.exchangeStars(starId1, starId2, {from: user2});
+
+    assert.equal(await instance.ownerOf.call(starId1), user2);
+    assert.equal(await instance.ownerOf.call(starId2), user1);
+});
+
+  //Stars Tokens can be transferred from one address to another.
+
+it('lets a user transfer a star', async() => {
+    let instance = await StarNotary.deployed();
+    let user1 = accounts[1];
+    let user2 = accounts[2];
+
+    let starId = 8;
+    await instance.createStar('Create awesome Star', starId, {from: user1});
+    assert.equal(await instance.ownerOf.call(starId), user1);
+
+    await instance.transferStar(user2, starId, {from: user1});
+    assert.equal(await instance.ownerOf.call(starId), user2);
+});
+
+
+
+it('lookUptokenIdToStarInfo test', async() => {
+    let instance = await StarNotary.deployed();
+    let user1 = accounts[1];
+
+    let starId = 9;
+    await instance.createStar('create awesome Star', starId, {from: user1});
+
+    let starname = await instance.lookUptokenIdToStarInfo(starId, {from: user1});
+    assert.equal(starname, 'star');
+});

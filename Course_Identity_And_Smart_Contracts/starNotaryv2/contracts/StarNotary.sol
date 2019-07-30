@@ -4,9 +4,14 @@ import "../node_modules/openzeppelin-solidity/contracts/token/ERC721/ERC721.sol"
 
 contract StarNotary is ERC721 {
 
+
     struct Star {
         string name;
     }
+    // Add a function lookUptokenIdToStarInfo
+
+   string public constant name = 'Masarah Token';
+    string public constant symbol = 'MAS';
 
     mapping(uint256 => Star) public tokenIdToStarInfo;
     mapping(uint256 => uint256) public starsForSale;
@@ -18,6 +23,10 @@ contract StarNotary is ERC721 {
         tokenIdToStarInfo[_tokenId] = newStar;
         _mint(msg.sender, _tokenId);
     }
+
+
+
+
 
     // Putting an Star for sale (Adding the star tokenid into the mapping starsForSale, first verify that the sender is the owner)
     function putStarUpForSale(uint256 _tokenId, uint256 _price) public {
@@ -40,6 +49,29 @@ contract StarNotary is ERC721 {
         if(msg.value > starCost) {
             msg.sender.transfer(msg.value - starCost);
         }
+    }
+
+        // Add a function lookUptokenIdToStarInfo
+    function lookUptokenIdToStarInfo( uint256 _tokenId) public view returns (string memory ) {
+      return tokenIdToStarInfo[_tokenId].name;
+    }
+
+
+
+    //  Add a function exchangeStars
+    function exchangeStars(uint256 _tokenId1, uint256 _tokenId2) public {
+        address owner1 = ownerOf(_tokenId1);
+        address owner2 = ownerOf(_tokenId2);
+        require(owner1 == msg.sender || owner2 == msg.sender, "You can't exchange the Star you don't owned");
+
+        _transferFrom(owner1, owner2, _tokenId1);
+        _transferFrom(owner2, owner1, _tokenId2);
+    }
+
+// Add a function transferStar
+    function transferStar(address _to1, uint256 _tokenId) public {
+        require(msg.sender == ownerOf(_tokenId), "You can't transfer the Star you don't owned");
+        _transferFrom(msg.sender, _to1, _tokenId);
     }
 
 }
